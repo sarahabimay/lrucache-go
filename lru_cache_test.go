@@ -91,3 +91,30 @@ func TestLRUCacheEvictLRUMenuWhenCapacityExceeded(t *testing.T) {
 		t.Logf("Success, cache contents: %v", cacheContents)
 	}
 }
+
+func TestLRUCacheRequestInsertSameMenu(t *testing.T) {
+	lru := lru_cache.NewLRU(3)
+
+	ok := lru.Add("Menu1")
+	if !ok {
+		t.Errorf("Add menu: Menu1 was not successful")
+	}
+	ok = lru.Add("Menu2")
+	if !ok {
+		t.Errorf("Add menu: %v was not successful", "Menu2")
+	}
+	ok = lru.Add("Menu1")
+	if !ok {
+		t.Errorf("Add menu: %v was not successful", "Menu1")
+	}
+
+	cacheContents := lru.Cache()
+	switch {
+	case len(cacheContents) != 2:
+		t.Errorf("Failure - Expect cache length 2, got %v", len(cacheContents))
+	case !reflect.DeepEqual(cacheContents, []string{"Menu1", "Menu2"}):
+		t.Errorf("Failure, Cache contents: %v does not equal: %v", cacheContents, []string{"Menu1", "Menu2"})
+	default:
+		t.Logf("Success")
+	}
+}
