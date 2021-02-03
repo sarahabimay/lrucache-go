@@ -118,3 +118,48 @@ func TestLRUCacheRequestInsertSameMenu(t *testing.T) {
 		t.Logf("Success")
 	}
 }
+
+func TestLRUCacheRequestNonexistantMenu(t *testing.T) {
+	lru := lru_cache.NewLRU(3)
+
+	item, ok := lru.Get(1)
+	if !ok {
+		t.Logf("Success")
+	} else {
+		t.Errorf("Failure, expected nothing to be found but got: %v", item)
+	}
+}
+
+func TestLRUCacheRequestAMenu(t *testing.T) {
+	lru := lru_cache.NewLRU(2)
+
+	lru.AddWithKey(1, "Menu1")
+	item, ok := lru.Get(1)
+	if ok {
+		t.Logf("Success")
+	} else {
+		t.Errorf("Failure, expected %v to be found but found: %v", "Menu2", item)
+	}
+}
+
+func TestLRUCacheGetItemMostRecentlyUsed(t *testing.T) {
+	lru := lru_cache.NewLRU(2)
+
+	lru.AddWithKey(1, "Menu1")
+	lru.AddWithKey(2, "Menu2")
+	cacheContentsBeforeGet := lru.Cache()
+	if !reflect.DeepEqual(cacheContentsBeforeGet, []string{"Menu2", "Menu1"}) {
+		t.Errorf("Failure, Cache contents: %v does not equal: %v", cacheContentsBeforeGet, []string{"Menu2", "Menu1"})
+	}
+
+	item, ok := lru.Get(1)
+	if ok {
+		t.Logf("Success")
+	} else {
+		t.Errorf("Failure, expected %v to be found but found: %v", "Menu2", item)
+	}
+	cacheContentsAfterGet := lru.Cache()
+	if !reflect.DeepEqual(cacheContentsAfterGet, []string{"Menu1", "Menu2"}) {
+		t.Errorf("Failure, Cache contents: %v does not equal: %v", cacheContentsAfterGet, []string{"Menu1", "Menu2"})
+	}
+}

@@ -7,21 +7,26 @@ type Node struct {
 }
 
 type LRU struct {
-	size int
-	head *Node
-	tail *Node
+	size     int
+	head     *Node
+	tail     *Node
+	itemsMap map[int]*Node
 }
 
 type LRUCache interface {
 	Size() int
 	Cache() []string
+	AddWithKey(key int, value string) bool
 	Add(value string) bool
+	Get(key int) string
 }
 
 func NewLRU(cacheSize int) *LRU {
 	return &LRU{
-		size: cacheSize,
-		head: nil,
+		size:     cacheSize,
+		head:     nil,
+		tail:     nil,
+		itemsMap: make(map[int]*Node),
 	}
 }
 
@@ -44,15 +49,32 @@ func (cache *LRU) Cache() []string {
 	return cacheContents
 }
 
-func (cache *LRU) Add(value string) bool {
+func (cache *LRU) Get(key int) (string, bool) {
+	item := cache.itemsMap[key]
+	if item == nil {
+		return "", false
+	}
+	cache.moveToHead(item)
+	return item.value, true
+}
+
+func (cache *LRU) AddWithKey(key int, value string) bool {
 	newNode := &Node{value: value}
+	cache.itemsMap[key] = newNode
+	return cache.addToList(newNode)
+}
+
+func (cache *LRU) Add(value string) bool {
+	return cache.addToList(&Node{value: value})
+}
+
+func (cache *LRU) addToList(newNode *Node) bool {
 	if cache.head == nil {
 		cache.head = newNode
 		cache.tail = newNode
 		return true
 	}
 	if cache.contains(newNode) {
-		log.Printf("Cache contains: %v", newNode.value)
 		cache.moveToHead(newNode)
 	} else {
 		cache.addToHead(newNode)
