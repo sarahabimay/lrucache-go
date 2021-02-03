@@ -26,7 +26,7 @@ func TestLRUCacheCreateCacheWithLength(t *testing.T) {
 
 func TestLRUCacheAddToEmptyCache(t *testing.T) {
 	lru := lru_cache.NewLRU(2)
-	ok := lru.Add("Menu1")
+	ok := lru.Add(1, "Menu1")
 
 	if !ok {
 		t.Errorf("Add was not successful")
@@ -45,11 +45,11 @@ func TestLRUCacheAddToEmptyCache(t *testing.T) {
 func TestLRUCacheAddTwoMenus(t *testing.T) {
 	lru := lru_cache.NewLRU(2)
 
-	ok := lru.Add("Menu1")
+	ok := lru.Add(1, "Menu1")
 	if !ok {
 		t.Errorf("Add menu: Menu1 was not successful")
 	}
-	ok = lru.Add("Menu2")
+	ok = lru.Add(2, "Menu2")
 	if !ok {
 		t.Errorf("Add menu: %v was not successful", "Menu2")
 	}
@@ -68,15 +68,15 @@ func TestLRUCacheAddTwoMenus(t *testing.T) {
 func TestLRUCacheEvictLRUMenuWhenCapacityExceeded(t *testing.T) {
 	lru := lru_cache.NewLRU(2)
 
-	ok := lru.Add("Menu1")
+	ok := lru.Add(1, "Menu1")
 	if !ok {
 		t.Errorf("Add menu: Menu1 was not successful")
 	}
-	ok = lru.Add("Menu2")
+	ok = lru.Add(2, "Menu2")
 	if !ok {
 		t.Errorf("Add menu: %v was not successful", "Menu2")
 	}
-	ok = lru.Add("Menu3")
+	ok = lru.Add(3, "Menu3")
 	if !ok {
 		t.Errorf("Add menu: %v was not successful", "Menu3")
 	}
@@ -95,15 +95,15 @@ func TestLRUCacheEvictLRUMenuWhenCapacityExceeded(t *testing.T) {
 func TestLRUCacheRequestInsertSameMenu(t *testing.T) {
 	lru := lru_cache.NewLRU(3)
 
-	ok := lru.Add("Menu1")
+	ok := lru.Add(1, "Menu1")
 	if !ok {
 		t.Errorf("Add menu: Menu1 was not successful")
 	}
-	ok = lru.Add("Menu2")
+	ok = lru.Add(2, "Menu2")
 	if !ok {
 		t.Errorf("Add menu: %v was not successful", "Menu2")
 	}
-	ok = lru.Add("Menu1")
+	ok = lru.Add(3, "Menu1")
 	if !ok {
 		t.Errorf("Add menu: %v was not successful", "Menu1")
 	}
@@ -133,7 +133,7 @@ func TestLRUCacheRequestNonexistantMenu(t *testing.T) {
 func TestLRUCacheRequestAMenu(t *testing.T) {
 	lru := lru_cache.NewLRU(2)
 
-	lru.AddWithKey(1, "Menu1")
+	lru.Add(1, "Menu1")
 	item, ok := lru.Get(1)
 	if ok {
 		t.Logf("Success")
@@ -145,8 +145,8 @@ func TestLRUCacheRequestAMenu(t *testing.T) {
 func TestLRUCacheGetItemMostRecentlyUsed(t *testing.T) {
 	lru := lru_cache.NewLRU(2)
 
-	lru.AddWithKey(1, "Menu1")
-	lru.AddWithKey(2, "Menu2")
+	lru.Add(1, "Menu1")
+	lru.Add(2, "Menu2")
 	cacheContentsBeforeGet := lru.Cache()
 	if !reflect.DeepEqual(cacheContentsBeforeGet, []string{"Menu2", "Menu1"}) {
 		t.Errorf("Failure, Cache contents: %v does not equal: %v", cacheContentsBeforeGet, []string{"Menu2", "Menu1"})

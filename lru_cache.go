@@ -16,8 +16,7 @@ type LRU struct {
 type LRUCache interface {
 	Size() int
 	Cache() []string
-	AddWithKey(key int, value string) bool
-	Add(value string) bool
+	Add(key int, value string) bool
 	Get(key int) string
 }
 
@@ -38,7 +37,7 @@ func (cache *LRU) Cache() []string {
 	cacheContents := make([]string, 0)
 	current := cache.head
 	if current == nil {
-		return []string{}
+		return cacheContents
 	} else {
 		cacheContents = append(cacheContents, current.value)
 	}
@@ -58,14 +57,10 @@ func (cache *LRU) Get(key int) (string, bool) {
 	return item.value, true
 }
 
-func (cache *LRU) AddWithKey(key int, value string) bool {
+func (cache *LRU) Add(key int, value string) bool {
 	newNode := &Node{value: value}
 	cache.itemsMap[key] = newNode
 	return cache.addToList(newNode)
-}
-
-func (cache *LRU) Add(value string) bool {
-	return cache.addToList(&Node{value: value})
 }
 
 func (cache *LRU) addToList(newNode *Node) bool {
